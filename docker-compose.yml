@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: compliance_engine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - compliance-network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - compliance-network
+
+  # MinIO for file storage
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - compliance-network
+
+  # Auth Service (NestJS)
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/compliance_engine
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret-jwt-key
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    networks:
+      - compliance-network
+
+  # File Service (Golang)
+  file-service:
+    build:
+      context: ./services/file-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/compliance_engine
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: documents
+    depends_on:
+      - postgres
+      - minio
+    volumes:
+      - ./services/file-service:/app
+      - /app/tmp
+    networks:
+      - compliance-network
+
+  # Analysis Service (Python)
+  analysis-service:
+    build:
+      context: ./services/analysis-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/compliance_engine
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: documents
+      OPENAI_API_KEY: your-openai-api-key
+    depends_on:
+      - postgres
+      - minio
+    volumes:
+      - ./services/analysis-service:/app
+    networks:
+      - compliance-network
+
+  # Web Application (React)
+  web-service:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:3000/api
+      REACT_APP_FILE_SERVICE_URL: http://localhost:8080
+      REACT_APP_ANALYSIS_SERVICE_URL: http://localhost:8000
+    depends_on:
+      - auth-service
+      - file-service
+      - analysis-service
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    networks:
+      - compliance-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  compliance-network:
+    driver: bridge 

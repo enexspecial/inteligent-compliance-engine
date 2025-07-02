@@ -1,0 +1,58 @@
+.analysis {
+  padding: 20px;
+}
+
+.analysis-header {
+  margin-bottom: 30px;
+}
+
+.analysis-header h1 {
+  margin: 0 0 10px 0;
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.analysis-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.analysis-content {
+  margin-top: 20px;
+}
+
+.analysis-placeholder {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.analysis-placeholder h3 {
+  margin: 0 0 20px 0;
+  color: var(--text-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.analysis-placeholder p {
+  margin: 0 0 15px 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.analysis-placeholder ul {
+  text-align: left;
+  max-width: 400px;
+  margin: 20px auto 0;
+  color: var(--text-muted);
+}
+
+.analysis-placeholder li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+} 

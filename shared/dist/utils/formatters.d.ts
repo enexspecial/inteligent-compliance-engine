@@ -1,0 +1,14 @@
+export declare const formatFileSize: (bytes: number) => string;
+export declare const formatDate: (dateString: string) => string;
+export declare const formatDateTime: (dateString: string) => string;
+export declare const formatComplianceScore: (score: number) => string;
+export declare const formatDuration: (seconds: number) => string;
+export declare const formatCurrency: (amount: number, currency?: string) => string;
+export declare const formatPercentage: (value: number, decimals?: number) => string;
+export declare const truncateText: (text: string, maxLength: number) => string;
+export declare const capitalizeFirst: (text: string) => string;
+export declare const formatPhoneNumber: (phone: string) => string;
+export declare const formatCreditCard: (cardNumber: string) => string;
+export declare const getSeverityColor: (severity: "low" | "medium" | "high" | "critical") => string;
+export declare const getStatusColor: (status: "pending" | "processing" | "completed" | "failed") => string;
+export declare const formatRelativeTime: (dateString: string) => string;
