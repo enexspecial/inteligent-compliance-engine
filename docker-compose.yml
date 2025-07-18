@@ -105,6 +105,30 @@ services:
     networks:
       - compliance-network
 
+  # API Gateway (NestJS)
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      JWT_SECRET: your-super-secret-jwt-key
+      AUTH_SERVICE_URL: http://auth-service:3000
+      FILE_SERVICE_URL: http://file-service:8080
+      ANALYSIS_SERVICE_URL: http://analysis-service:8000
+    depends_on:
+      - auth-service
+      - file-service
+      - analysis-service
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+    networks:
+      - compliance-network
+
   # Web Application (React)
   web-service:
     build:
@@ -113,13 +137,11 @@ services:
     ports:
       - "3001:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:3000/api
-      REACT_APP_FILE_SERVICE_URL: http://localhost:8080
-      REACT_APP_ANALYSIS_SERVICE_URL: http://localhost:8000
+      REACT_APP_API_URL: http://localhost:4000/api
+      REACT_APP_FILE_SERVICE_URL: http://localhost:4000/api
+      REACT_APP_ANALYSIS_SERVICE_URL: http://localhost:4000/api
     depends_on:
-      - auth-service
-      - file-service
-      - analysis-service
+      - api-gateway
     volumes:
       - ./web:/app
       - /app/node_modules

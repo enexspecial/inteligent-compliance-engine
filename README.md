@@ -1,18 +1,18 @@
 # Intelligent Compliance Engine
 
-A comprehensive fullstack compliance document processing and analysis system built with NestJS, Python, Golang, React, and React Native.
+A comprehensive fullstack compliance document processing and analysis system built with NestJS, Python, Golang, and React Native.
 
 ## Architecture
 
 This monorepo contains multiple applications:
 
 ### Backend Services (Microservices)
-- **Auth Service (NestJS)**: Handles authentication, user management, and API gateway
+- **API Gateway (NestJS)**: Single entry point for all client applications with centralized authentication
+- **Auth Service (NestJS)**: Handles authentication, user management, and authorization
 - **File Processing Service (Golang)**: Manages document upload, processing, and storage
 - **Document Analysis Service (Python)**: Performs document analysis using LangChain and AI
 
-### Frontend Applications
-- **Web Application (React)**: Professional web interface for document management and analysis
+### Frontend Application
 - **Mobile Application (React Native + Expo)**: Cross-platform mobile app for on-the-go access
 
 ## Project Structure
@@ -20,18 +20,10 @@ This monorepo contains multiple applications:
 ```
 inteligent-compliance-engine/
 ├── services/               # Backend microservices
+│   ├── api-gateway/        # NestJS API Gateway
 │   ├── auth-service/       # NestJS authentication service
 │   ├── file-service/       # Golang file processing service
 │   └── analysis-service/   # Python document analysis service
-├── web/                    # React web application
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── pages/          # Page components
-│   │   ├── contexts/       # React contexts
-│   │   ├── services/       # API services
-│   │   └── utils/          # Utility functions
-│   ├── public/             # Static assets
-│   └── package.json
 ├── mobile/                 # React Native mobile app
 │   ├── src/
 │   │   ├── components/     # React Native components
@@ -50,6 +42,8 @@ inteligent-compliance-engine/
 ├── docker-compose.yml      # Development environment
 └── README.md
 ```
+
+> **Note:** The web application has been removed from this repository. The mobile app is now the primary frontend.
 
 ## Quick Start
 
@@ -85,8 +79,13 @@ chmod +x scripts/setup-dev.sh
 
 3. **Setup Backend Services**
    ```bash
+   # API Gateway
+   cd services/api-gateway
+   npm install
+   npm run build
+   
    # Auth Service
-   cd services/auth-service
+   cd ../auth-service
    npm install
    npm run build
    
@@ -99,14 +98,9 @@ chmod +x scripts/setup-dev.sh
    pip3 install -r requirements.txt
    ```
 
-4. **Setup Frontend Applications**
+4. **Setup Mobile Application**
    ```bash
-   # Web Application
-   cd web
-   npm install
-   
-   # Mobile Application
-   cd ../mobile
+   cd mobile
    npm install
    ```
 
@@ -123,10 +117,6 @@ chmod +x scripts/setup-dev.sh
    # Start all backend services with Docker Compose
    docker-compose up -d
    
-   # Start web application (in new terminal)
-   cd web
-   npm start
-   
    # Start mobile application (in new terminal)
    cd mobile
    npm start
@@ -134,10 +124,10 @@ chmod +x scripts/setup-dev.sh
 
 ## Development URLs
 
+- **API Gateway**: http://localhost:4000/api
 - **Auth Service**: http://localhost:3000/api
 - **File Service**: http://localhost:8080
 - **Analysis Service**: http://localhost:8000
-- **React Web App**: http://localhost:3001
 - **Expo Dev Tools**: http://localhost:19002
 
 ## Deployment
@@ -154,42 +144,38 @@ Railway is a great platform for deploying the backend services. See the complete
 3. Set environment variables
 4. Deploy!
 
-### Frontend Deployment
+### Mobile App Deployment
 
-- **Web App**: Deploy to Vercel, Netlify, or Railway
 - **Mobile App**: Use Expo's build service for iOS/Android
 
 ## Features
-
-### Web Application
-- **Modern UI**: Responsive design with dark/light theme support
-- **Authentication**: Secure login/logout with JWT tokens
-- **Document Management**: Upload, view, and manage compliance documents
-- **Analysis Dashboard**: View compliance analysis results and reports
-- **User Management**: Profile management and settings
 
 ### Mobile Application
 - **Cross-platform**: Works on iOS and Android
 - **Offline Support**: Basic offline functionality
 - **Push Notifications**: Real-time updates for analysis completion
 - **Camera Integration**: Document scanning and upload
+- **Authentication**: Secure login/logout with JWT tokens
+- **Document Management**: Upload, view, and manage compliance documents
+- **Analysis Dashboard**: View compliance analysis results and reports
+- **User Management**: Profile management and settings
 
 ### Backend Services
+- **API Gateway**: Single entry point with centralized authentication and routing
 - **Microservices Architecture**: Scalable and maintainable
 - **AI-Powered Analysis**: LangChain integration for compliance checking
 - **File Processing**: Support for multiple document formats
 - **Job Queue**: BullMQ for background processing
-- **API Gateway**: Centralized authentication and routing
 
 ## Technology Stack
 
 ### Backend
+- **API Gateway**: NestJS, TypeScript, JWT, Axios
 - **Auth Service**: NestJS, TypeScript, PostgreSQL, Redis, JWT
 - **File Service**: Golang, Gin, PostgreSQL, MinIO
 - **Analysis Service**: Python, FastAPI, LangChain, OpenAI
 
 ### Frontend
-- **Web**: React 18, TypeScript, React Router, CSS3
 - **Mobile**: React Native, Expo, TypeScript
 
 ### Infrastructure
@@ -211,10 +197,10 @@ When modifying shared types or utilities:
 
 ### Service Development
 
-1. **Auth Service**: `cd services/auth-service && npm run start:dev`
-2. **File Service**: `cd services/file-service && go run main.go`
-3. **Analysis Service**: `cd services/analysis-service && python main.py`
-4. **Web App**: `cd web && npm start`
+1. **API Gateway**: `cd services/api-gateway && npm run start:dev`
+2. **Auth Service**: `cd services/auth-service && npm run start:dev`
+3. **File Service**: `cd services/file-service && go run main.go`
+4. **Analysis Service**: `cd services/analysis-service && python main.py`
 5. **Mobile App**: `cd mobile && npm start`
 
 ## Environment Variables
@@ -227,17 +213,11 @@ JWT_EXPIRES_IN=24h
 REDIS_URL=redis://localhost:6379
 PORT=3000
 NODE_ENV=development
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-### Frontend Applications (.env)
+### Mobile Application (.env)
 ```bash
-# Web App
-REACT_APP_API_URL=http://localhost:3000/api
-REACT_APP_FILE_SERVICE_URL=http://localhost:8080
-REACT_APP_ANALYSIS_SERVICE_URL=http://localhost:8000
-
-# Mobile App
 EXPO_PUBLIC_API_URL=http://localhost:3000/api
 EXPO_PUBLIC_FILE_SERVICE_URL=http://localhost:8080
 EXPO_PUBLIC_ANALYSIS_SERVICE_URL=http://localhost:8000
@@ -250,7 +230,7 @@ EXPO_PUBLIC_ANALYSIS_SERVICE_URL=http://localhost:8000
 1. **TypeScript Import Errors**: Make sure shared types are built (`cd shared && npm run build`)
 2. **Database Connection**: Verify PostgreSQL is running and credentials are correct
 3. **Redis Connection**: Ensure Redis is running for BullMQ
-4. **Port Conflicts**: Check if ports 3000, 3001, 8080, 8000, 19002 are available
+4. **Port Conflicts**: Check if ports 3000, 8080, 8000, 19002 are available
 5. **Mobile Development**: Install Expo CLI and Expo Go app for testing
 
 ### Development Tips
@@ -259,7 +239,7 @@ EXPO_PUBLIC_ANALYSIS_SERVICE_URL=http://localhost:8000
 - Always build shared types after changes
 - Check service logs for detailed error messages
 - Use Docker Compose for consistent development environment
-- Test both web and mobile applications regularly
+- Test the mobile application regularly
 
 ## Contributing
 
