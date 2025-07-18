@@ -12,7 +12,6 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../App';
 import { useAuth } from '../contexts/AuthContext';
-import { LoginCredentials } from '../../../shared/types';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -21,24 +20,22 @@ interface Props {
 }
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
 
   const handleLogin = async () => {
-    if (!credentials.email || !credentials.password) {
+    if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setIsLoading(true);
     try {
-      await login(credentials);
-      navigation.replace('Dashboard');
+      await login(email, password);
+      navigation.replace('Main');
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid credentials. Please try again.');
     } finally {
@@ -59,8 +56,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Email"
-            value={credentials.email}
-            onChangeText={(text) => setCredentials(prev => ({ ...prev, email: text }))}
+            value={email}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
@@ -69,8 +66,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Password"
-            value={credentials.password}
-            onChangeText={(text) => setCredentials(prev => ({ ...prev, password: text }))}
+            value={password}
+            onChangeText={setPassword}
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
